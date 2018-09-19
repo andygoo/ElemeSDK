@@ -1,0 +1,21 @@
+{
+  "name": "hillpy/eleme-sdk",
+  "description": "a eleme sdk",
+  "keywords": ["蜂鸟配送", "eleme", "饿了么"],
+  "version": "1.0.0",
+  "type": "library",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "shinn_lancelot",
+      "email": "945226793@qq.com"
+    }
+  ],
+  "require": {},
+  "minimum-stability": "stable",
+  "autoload": {
+    "psr-4": {
+      "hillpy\\ElemmeSDK\\": "src/"
+    }
+  }
+}
