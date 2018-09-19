@@ -7,10 +7,14 @@
  */
 namespace hillpy\ElemeSDK;
 
+include "Common.php";
+
 class Eleme
 {
     private $appId;
     private $secretKey;
+    private $salt;
+    private $accessToken;
 
     const saltMin = 1000;
     const saltMax = 9999;
@@ -22,18 +26,34 @@ class Eleme
     {
         $this->appId = $appId;
         $this->secretKey = $secretKey;
-
+        $this->salt = mt_rand(Eleme::saltMin, Eleme::saltMax);
+        $this->accessToken = $this->getAccessToken();
     }
 
     public function getAccessToken()
     {
         $paramArr = array(
             'app_id'=>$this->appId,
-            'salt'=>mt_rand(Eleme::saltMin, Eleme::saltMax),
+            'salt'=>$this->salt,
+            'signature'=>$this->getSignature()
         );
         $url = Eleme::API_HOST . Eleme::ACCESS_TOKEN_PATH . http_build_query($paramArr);
         $res = $this->checkResult(json_decode(Common::http_request($url), true));
-        return $res;
+        if ($res['code'] == 200) {
+            return $res['data']['access_token'];
+        } else {
+            return '';
+        }
+    }
+
+    public function getSignature()
+    {
+        $strArr = array(
+            'app_id'=>$this->appId,
+            'salt'=>$this->salt,
+            'secret_key'=>$this->secretKey,
+        );
+        return md5(urlencode(http_build_query($strArr)));
     }
 
     public function checkResult($res = array())
