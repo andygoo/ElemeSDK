@@ -12,15 +12,27 @@ use hillpy\ElemeSDK\Eleme;
 $appId = 'app_id';
 $secretKey = 'secret_key';
 
+// 设置实例化参数
+$paramArr = array(
+    'appId'=>$appId,
+    'secretKey'=>$secretKey,
+    'debug'=>true,
+    'accessToken'=>''
+);
+
 // 从redis获取accessToken;
 $redis = new Redis();
 $redis->connect('127.0.0.1', 6379);
 $accessToken = $redis->get('eleme_access_token_appid_' . $appId);
 
-// 若不存在，实例化Eleme
-if ($accessToken == '') {
-    $eleme = new Eleme($appId, $secretKey);
+// 若存在accessToken，加入paramArr数组中
+$accessToken && $paramArr['accessToken'] = $accessToken;
 
+// 实例化Eleme
+$eleme = new Eleme($praramArr);
+
+//若缓存中不存在accessToken，从新实例化对象中获取并写入redis
+if (!$accessToken) {
     $accessToken = $eleme->accessTokenData['access_token'];
 
     if ($accessToken) {
@@ -29,10 +41,6 @@ if ($accessToken == '') {
         $cacheTime = $expireTime - time();
         $redis->setex('eleme_access_token_appid_' . $appId, $cacheTime, $accessToken);
     }
-
-// 若存在accessToken，则实例化时传入此参数
-} else {
-    $eleme = new Eleme($appId, $secretKey, $accessToken);
 }
 
 // 输出accessToken

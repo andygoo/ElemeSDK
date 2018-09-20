@@ -11,25 +11,36 @@ include "Common.php";
 
 class Eleme
 {
-    private $appId;
-    private $secretKey;
-    private $salt;
-    private $accessToken;
-    public $accessTokenData;
+    private $appId = '';
+    private $secretKey = '';
+    private $salt = '';
+    private $accessToken = '';
+    private $commonParamArr = array();
+    private $apiHost = '';
+    public $accessTokenData = array();
 
     const saltMin = 1000;
     const saltMax = 9999;
+    const API_HOST_DEBUG = 'https://exam-anubis.ele.me';
     const API_HOST = 'https://open-anubis.ele.me';
     const ACCESS_TOKEN_PATH = '/anubis-webapi/get_access_token?';
+    const ORDER_PATH = '/anubis-webapi/v2/order';
 
 
-    public function __construct($appId = '', $secretKey = '', $accessToken = '')
+    public function __construct($paramArr = array())
     {
-        $this->appId = $appId;
-        $this->secretKey = $secretKey;
+        $this->apiHost = $paramArr['debug'] === true ? Eleme::API_HOST_DEBUG : Eleme::API_HOST;
+        $this->appId = $paramArr['appId'];
+        $this->secretKey = $paramArr['secretKey'];
         $this->salt = mt_rand(Eleme::saltMin, Eleme::saltMax);
-        if ($accessToken) {
-            $this->accessToken = $accessToken;
+        $this->commonParamArr = array(
+            'app_id'=>$this->appId,
+            'salt'=>$this->salt,
+            'signature'=>$this->getSignature()
+        );
+
+        if ($paramArr['accessToken']) {
+            $this->accessToken = $paramArr['accessToken'];
         } else {
             $this->accessTokenData = $this->getAccessTokenData();
             $this->accessTokenData && $this->accessToken = $this->accessTokenData['access_token'];
@@ -38,12 +49,8 @@ class Eleme
 
     public function getAccessTokenData()
     {
-        $paramArr = array(
-            'app_id'=>$this->appId,
-            'salt'=>$this->salt,
-            'signature'=>$this->getSignature()
-        );
-        $url = Eleme::API_HOST . Eleme::ACCESS_TOKEN_PATH . http_build_query($paramArr);
+        $paramArr = $this->commonParamArr;
+        $url = $this->apiHost . Eleme::ACCESS_TOKEN_PATH . http_build_query($paramArr);
         $res = $this->checkResult(json_decode(Common::http_request($url), true));
         if ($res['code'] == 200) {
             return $res['data'];
@@ -54,12 +61,20 @@ class Eleme
 
     public function getSignature()
     {
-        $strArr = array(
+        $paramArr = array(
             'app_id'=>$this->appId,
             'salt'=>$this->salt,
             'secret_key'=>$this->secretKey,
         );
-        return md5(urlencode(http_build_query($strArr)));
+        return md5(urlencode(http_build_query($paramArr)));
+    }
+
+    public function addOrder($extendParamArr = array())
+    {
+        $paramArr = array_merge($extendParamArr, $this->commonParamArr);
+        $url = $this->apiHost . Eleme::ORDER_PATH;
+        $res = $this->checkResult(json_decode(Common::http_request($url, json_encode($paramArr)), true));
+        return $res;
     }
 
     public function checkResult($res = array())
