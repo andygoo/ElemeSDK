@@ -25,7 +25,14 @@ class Eleme
     const API_HOST = 'https://open-anubis.ele.me';
     const ACCESS_TOKEN_PATH = '/anubis-webapi/get_access_token?';
     const ORDER_PATH = '/anubis-webapi/v2/order';
-
+    const ORDER_CANCEL_PATH = '/anubis-webapi/v2/order/cancel';
+    const ORDER_QUERY_PATH = '/anubis-webapi/v2/order/query';
+    const ORDER_COMPLAINT_PATH = '/anubis-webapi/v2/order/complaint';
+    const ORDER_CARRIER = '/anubis-webapi/v2/order/carrier';
+    const CHAIN_STORE_PATH = '/anubis-webapi/v2/chain_store';
+    const CHAIN_STORE_QUERY_PATH = '/anubis-webapi/v2/chain_store/query';
+    const CHAIN_STORE_UPDATE_PATH = '/anubis-webapi/v2/chain_store/update';
+    const CHAIN_STORE_DELIVERY_QUERY_PATH = '/anubis-webapi/v2/chain_store/update';
 
     public function __construct($paramArr = array())
     {
@@ -49,6 +56,10 @@ class Eleme
 
     public function getAccessTokenData()
     {
+        return array(
+            'access_token'=>uniqid(),
+            'expire_time'=> (time() + 20) * 1000
+        );
         $paramArr = $this->commonParamArr;
         $url = $this->apiHost . Eleme::ACCESS_TOKEN_PATH . http_build_query($paramArr);
         $res = $this->checkResult(json_decode(Common::http_request($url), true));

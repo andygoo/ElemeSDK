@@ -2,7 +2,7 @@
 
 /**
  * 使用案例
- * 注意：实际项目请先引入自动加载脚本（require __DIR__ . '/vender/autoload.php';），此例子中直接引用类库
+ * 注意：实际项目请先引入自动加载脚本（require __DIR__ . '/vender/autoload.php';），此例子中直接引用类库。另外需安装redis扩展并开启redis服务
  */
 require __DIR__ . '/src/Eleme.php';
 
@@ -29,16 +29,20 @@ $accessToken = $redis->get('eleme_access_token_appid_' . $appId);
 $accessToken && $paramArr['accessToken'] = $accessToken;
 
 // 实例化Eleme
-$eleme = new Eleme($praramArr);
+$eleme = new Eleme($paramArr);
 
 //若缓存中不存在accessToken，从新实例化对象中获取并写入redis
 if (!$accessToken) {
-    $accessToken = $eleme->accessTokenData['access_token'];
+     isset($eleme->accessTokenData['access_token']) && $accessToken = $eleme->accessTokenData['access_token'];
 
     if ($accessToken) {
         // 获取的expire_time为毫秒时间戳，转秒时间戳并减去10秒（过期时间适当提前避免accessToken实际已失效）
-        $expireTime = intval(($eleme->accessTokenData['expire_time'] / 1000)) - 10;
-        $cacheTime = $expireTime - time();
+        if (isset($eleme->accessTokenData['expire_time'])) {
+            $expireTime = intval(($eleme->accessTokenData['expire_time'] / 1000)) - 10;
+            $cacheTime = $expireTime - time();
+        } else {
+            $cacheTime = 0;
+        }
         $redis->setex('eleme_access_token_appid_' . $appId, $cacheTime, $accessToken);
     }
 }
