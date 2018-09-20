@@ -15,6 +15,7 @@ class Eleme
     private $secretKey;
     private $salt;
     private $accessToken;
+    public $accessTokenData;
 
     const saltMin = 1000;
     const saltMax = 9999;
@@ -22,15 +23,20 @@ class Eleme
     const ACCESS_TOKEN_PATH = '/anubis-webapi/get_access_token?';
 
 
-    public function __construct($appId, $secretKey)
+    public function __construct($appId = '', $secretKey = '', $accessToken = '')
     {
         $this->appId = $appId;
         $this->secretKey = $secretKey;
         $this->salt = mt_rand(Eleme::saltMin, Eleme::saltMax);
-        $this->accessToken = $this->getAccessToken();
+        if ($accessToken) {
+            $this->accessToken = $accessToken;
+        } else {
+            $this->accessTokenData = $this->getAccessTokenData();
+            $this->accessTokenData && $this->accessToken = $this->accessTokenData['access_token'];
+        }
     }
 
-    public function getAccessToken()
+    public function getAccessTokenData()
     {
         $paramArr = array(
             'app_id'=>$this->appId,
@@ -40,7 +46,7 @@ class Eleme
         $url = Eleme::API_HOST . Eleme::ACCESS_TOKEN_PATH . http_build_query($paramArr);
         $res = $this->checkResult(json_decode(Common::http_request($url), true));
         if ($res['code'] == 200) {
-            return $res['data']['access_token'];
+            return $res['data'];
         } else {
             return '';
         }
