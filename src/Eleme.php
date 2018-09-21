@@ -28,12 +28,17 @@ class Eleme
     const ORDER_CANCEL_PATH = '/anubis-webapi/v2/order/cancel';
     const ORDER_QUERY_PATH = '/anubis-webapi/v2/order/query';
     const ORDER_COMPLAINT_PATH = '/anubis-webapi/v2/order/complaint';
-    const ORDER_CARRIER = '/anubis-webapi/v2/order/carrier';
+    const ORDER_CARRIER_PATH = '/anubis-webapi/v2/order/carrier';
     const CHAIN_STORE_PATH = '/anubis-webapi/v2/chain_store';
     const CHAIN_STORE_QUERY_PATH = '/anubis-webapi/v2/chain_store/query';
     const CHAIN_STORE_UPDATE_PATH = '/anubis-webapi/v2/chain_store/update';
     const CHAIN_STORE_DELIVERY_QUERY_PATH = '/anubis-webapi/v2/chain_store/update';
 
+    /**
+     * 初始化部分变量
+     * Eleme constructor.
+     * @param array $paramArr
+     */
     public function __construct($paramArr = array())
     {
         $this->apiHost = $paramArr['debug'] === true ? Eleme::API_HOST_DEBUG : Eleme::API_HOST;
@@ -54,12 +59,12 @@ class Eleme
         }
     }
 
+    /**
+     * accessToken数据数组获取
+     * @return mixed|string
+     */
     public function getAccessTokenData()
     {
-        return array(
-            'access_token'=>uniqid(),
-            'expire_time'=> (time() + 20) * 1000
-        );
         $paramArr = $this->commonParamArr;
         $url = $this->apiHost . Eleme::ACCESS_TOKEN_PATH . http_build_query($paramArr);
         $res = $this->checkResult(json_decode(Common::http_request($url), true));
@@ -70,6 +75,10 @@ class Eleme
         }
     }
 
+    /**
+     * 获取签名
+     * @return string
+     */
     public function getSignature()
     {
         $paramArr = array(
@@ -80,10 +89,229 @@ class Eleme
         return md5(urlencode(http_build_query($paramArr)));
     }
 
+    /**
+     * 添加订单（下单）
+     * @param array $extendParamArr
+     * $extendParamArr['data']的json形式：{
+            "partner_remark": "商户备注信息",
+            "partner_order_code": "12345678",
+            "notify_url": "http://123.100.120.22:8090",
+            "order_type": 1,
+            "chain_store_code": "A001",
+            "transport_info": {
+                "transport_name": "XXX烤鸭店",
+                "transport_address": "上海市普陀区近铁城市广场5楼",
+                "transport_longitude": 120.00000,
+                "transport_latitude": 30.11111,
+                "position_source": 1,
+                "transport_tel": "13901232231",
+                "transport_remark": "备注"
+            },
+            "order_add_time": 1452570728594,
+            "order_total_amount": 50.00,
+            "order_actual_amount": 48.00,
+            "order_weight": 3.5,
+            "order_remark": "用户备注",
+            "is_invoiced": 1,
+            "invoice": "xxx有限公司",
+            "order_payment_status": 1,
+            "order_payment_method": 1,
+            "is_agent_payment": 0,
+            "require_payment_pay": 50.00,
+            "goods_count": 4,
+            "require_receive_time": 1452570728594,
+            "serial_number": "5678",
+            "receiver_info": {
+                "receiver_name": "李明",
+                "receiver_primary_phone": "13900000000",
+                "receiver_second_phone": "13911111111",
+                "receiver_address": "上海市近铁广场",
+                "receiver_longitude": 130.0,
+                "receiver_latitude": 30.0,
+                "position_source": 1
+            },
+            "items_json": [
+            {
+                "item_id": "fresh0001",
+                "item_name": "苹果",
+                "item_quantity": 5,
+                "item_price": 10.00,
+                "item_actual_price": 9.50,
+                "item_size": 1,
+                "item_remark": "苹果，轻放",
+                "is_need_package": 1,
+                "is_agent_purchase": 0,
+                "agent_purchase_price": 10.00
+            },
+            {
+                "item_id": "fresh0002",
+                "item_name": "香蕉",
+                "item_quantity": 1,
+                "item_price": 20.00,
+                "item_actual_price": 19.00,
+                "item_size": 2,
+                "item_remark": "香蕉，轻放",
+                "is_need_package": 1,
+                "is_agent_purchase": 0,
+                "agent_purchase_price": 10.00
+            }]
+        },
+     * @return array
+     */
     public function addOrder($extendParamArr = array())
     {
         $paramArr = array_merge($extendParamArr, $this->commonParamArr);
         $url = $this->apiHost . Eleme::ORDER_PATH;
+        $res = $this->checkResult(json_decode(Common::http_request($url, json_encode($paramArr)), true));
+        return $res;
+    }
+
+    /**
+     * 取消订单
+     * @param array $extendParamArr
+     * $extendParamArr['data']的json形式：{
+            "partner_order_code": "BG32141",
+            "order_cancel_reason_code": 2,
+            "order_cancel_code": 1,
+            "order_cancel_description": "货品不新鲜",
+            "order_cancel_time": 1452570728594
+        },
+     * @return array
+     */
+    public function cancelOrder($extendParamArr = array())
+    {
+        $paramArr = array_merge($extendParamArr, $this->commonParamArr);
+        $url = $this->apiHost . Eleme::ORDER_CANCEL_PATH;
+        $res = $this->checkResult(json_decode(Common::http_request($url, json_encode($paramArr)), true));
+        return $res;
+    }
+
+    /**
+     * 查询订单
+     * @param array $extendParamArr
+     * $extendParamArr['data']的json形式：{
+            "partner_order_code": "1383837732"
+        }
+     * @return array
+     */
+    public function queryOrder($extendParamArr = array())
+    {
+        $paramArr = array_merge($extendParamArr, $this->commonParamArr);
+        $url = $this->apiHost . Eleme::ORDER_QUERY_PATH;
+        $res = $this->checkResult(json_decode(Common::http_request($url, json_encode($paramArr)), true));
+        return $res;
+    }
+
+    /**
+     * 投诉订单
+     * @param array $extendParamArr
+     * $extendParamArr['data']的json形式：{
+            "partner_order_code": "BG32141",
+            "order_complaint_code": 150,
+            "order_complaint_desc": "未保持餐品完整",
+            "order_complaint_time": 1452570728594
+        },
+     * @return array
+     */
+    public function complaintOrder($extendParamArr = array())
+    {
+        $paramArr = array_merge($extendParamArr, $this->commonParamArr);
+        $url = $this->apiHost . Eleme::ORDER_COMPLAINT_PATH;
+        $res = $this->checkResult(json_decode(Common::http_request($url, json_encode($paramArr)), true));
+        return $res;
+    }
+
+    /**
+     * 获取骑手位置
+     * @param array $extendParamArr
+     * $extendParamArr['data']的json形式：{
+            "partner_order_code": "BG32141",
+        },
+     * @return array
+     */
+    public function getOrderCarrier($extendParamArr = array())
+    {
+        $paramArr = array_merge($extendParamArr, $this->commonParamArr);
+        $url = $this->apiHost . Eleme::ORDER_CARRIER_PATH;
+        $res = $this->checkResult(json_decode(Common::http_request($url, json_encode($paramArr)), true));
+        return $res;
+    }
+
+    /**
+     * 添加门店信息
+     * @param array $extendParamArr
+     * $extendParamArr['data']的json形式：{
+            "chain_store_code": "A001",
+            "chain_store_name": "门店一",
+            "contact_phone": "13611581190",
+            "address": "上海市",
+            "position_source": 3,
+            "longitude": "109.690773",
+            "latitude": "19.91243",
+            "service_code": "1"
+        },
+     * @return array
+     */
+    public function addChainStore($extendParamArr = array())
+    {
+        $paramArr = array_merge($extendParamArr, $this->commonParamArr);
+        $url = $this->apiHost . Eleme::CHAIN_STORE_PATH;
+        $res = $this->checkResult(json_decode(Common::http_request($url, json_encode($paramArr)), true));
+        return $res;
+    }
+
+    /**
+     * 查询门店信息
+     * @param array $extendParamArr
+     * $extendParamArr['data']的json形式：{
+        "chain_store_code": ["A001","A002"]
+        }
+     * @return array
+     */
+    public function queryChainStore($extendParamArr = array())
+    {
+        $paramArr = array_merge($extendParamArr, $this->commonParamArr);
+        $url = $this->apiHost . Eleme::CHAIN_STORE_QUERY_PATH;
+        $res = $this->checkResult(json_decode(Common::http_request($url, json_encode($paramArr)), true));
+        return $res;
+    }
+
+    /**
+     * @param array $extendParamArr
+     * $extendParamArr['data']的json形式：{
+            "chain_store_code": "A001",
+            "chain_store_name": "门店一",
+            "contact_phone": "13611581190",
+            "address": "上海市",
+            "position_source": 3,
+            "longitude": "109.690773",
+            "latitude": "19.91243",
+            "service_code": "1"
+        }
+     * @return array
+     */
+    public function updateChainStore($extendParamArr = array())
+    {
+        $paramArr = array_merge($extendParamArr, $this->commonParamArr);
+        $url = $this->apiHost . Eleme::CHAIN_STORE_UPDATE_PATH;
+        $res = $this->checkResult(json_decode(Common::http_request($url, json_encode($paramArr)), true));
+        return $res;
+    }
+
+    /**
+     * @param array $extendParamArr
+     * $extendParamArr['data']的json形式：{
+            "chain_store_code": "A001",
+            "position_source": 3,
+            "receiver_longitude": "109.690773",
+            "receiver_latitude": "19.91243"
+        }
+     * @return array
+     */
+    public function queryChainStoreDelivery($extendParamArr = array())
+    {
+        $paramArr = array_merge($extendParamArr, $this->commonParamArr);
+        $url = $this->apiHost . Eleme::CHAIN_STORE_DELIVERY_QUERY_PATH;
         $res = $this->checkResult(json_decode(Common::http_request($url, json_encode($paramArr)), true));
         return $res;
     }
