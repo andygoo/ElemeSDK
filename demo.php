@@ -9,8 +9,8 @@ require __DIR__ . '/src/Eleme.php';
 use hillpy\ElemeSDK\Eleme;
 
 // 设置变量
-$appId = 'app_id';
-$secretKey = 'secret_key';
+$appId = '';
+$secretKey = '';
 
 // 设置实例化参数
 $paramArr = array(
@@ -49,7 +49,7 @@ if (!$accessToken) {
 
 // 输出accessToken
 if ($accessToken == '') {
-    echo 'accessToken获取失败';
+    echo 'accessToken获取失败<br>';
 } else {
-    echo 'accessToken:' . $accessToken;
+    echo 'accessToken:' . $accessToken . '<br>';
 }
