@@ -17,13 +17,16 @@ class Common
     {
         $curl = curl_init();
         curl_setopt($curl, CURLOPT_URL, $url);
-        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, FALSE);
-        curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, FALSE);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($curl, CURLOPT_HEADER, false);
+        curl_setopt($curl, CURLOPT_TIMEOUT, 30);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
+        curl_setopt($curl, CURLOPT_HTTPHEADER, array('Content-type: Application/json'));
         if (!empty($data)) {
-            curl_setopt($curl, CURLOPT_POST, 1);
+            curl_setopt($curl, CURLOPT_POST, true);
             curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
         }
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
         $output = curl_exec($curl);
         curl_close($curl);
         return $output;
@@ -35,7 +38,7 @@ class Common
      * @param int $option
      * @return null|string|string[]
      */
-    public static function jsonEncode($arr = array(), $option = 0)
+    public static function jsonEncode($arr = array(), $option = '')
     {
         if ($option == 'JSON_UNESCAPED_UNICODE') {
             if (version_compare(PHP_VERSION,'5.4.0','>=')) {
@@ -43,8 +46,11 @@ class Common
             } else {
                 return Common::decodeUnicode(json_encode($arr));
             }
-        } else {
+        } else if ($option) {
             return json_encode($arr, $option);
+        } else {
+            print_r(json_encode($arr));
+            return json_encode($arr);
         }
     }
 

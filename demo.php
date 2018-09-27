@@ -2,7 +2,7 @@
 
 /**
  * 使用案例
- * 注意：实际项目请先引入自动加载脚本（require __DIR__ . '/vender/autoload.php';），此例子中直接引用类库。另外需安装redis扩展并开启redis服务
+ * 注意：实际项目若使用composer安装的库，请先引入自动加载脚本（require __DIR__ . '/vender/autoload.php';），此例子中直接引用类库。另外需安装redis扩展并开启redis服务
  */
 require __DIR__ . '/src/Eleme.php';
 

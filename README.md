@@ -1,11 +1,16 @@
 # 饿了么蜂鸟配送php开发包(开发中)
 
+[![issue](https://img.shields.io/github/issues/hillpy/ElemeSDK.svg)](https://github.com/hillpy/ElemeSDK/issues)
+[![star](https://img.shields.io/github/stars/hillpy/ElemeSDK.svg)](https://github.com/hillpy/ElemeSDK)
+[![fork](https://img.shields.io/github/forks/hillpy/ElemeSDK.svg)](https://github.com/hillpy/ElemeSDK)
+[![license](https://img.shields.io/github/license/hillpy/ElemeSDK.svg)](https://github.com/hillpy/ElemeSDK/blob/master/LICENSE)
+
 ### 功能介绍
 #### 本项目为蜂鸟配送开放平台api封装库，使用php语言实现，封装为composer包。
 
 ### 安装方法
 
-1. 直接克隆项目或下载发行版
+1. 下载发行版
 
 2. 使用composer安装（推荐）
 
@@ -22,13 +27,13 @@ composer require hillpy/eleme-sdk
 ```
 /**
  * 使用案例
- * 注意：实际项目请先引入自动加载脚本（require __DIR__ . '/vender/autoload.php';）。另外需安装redis扩展并开启redis服务
+ * 注意：实际项目若使用composer安装的库，请先引入自动加载脚本（require __DIR__ . '/vender/autoload.php';）。另外需安装redis扩展并开启redis服务
  */
 use hillpy\ElemeSDK\Eleme;
 
 // 设置变量
-$appId = 'app_id';
-$secretKey = 'secret_key';
+$appId = '';
+$secretKey = '';
 
 // 设置实例化参数
 $paramArr = array(
@@ -72,3 +77,12 @@ if ($accessToken == '') {
     echo 'accessToken:' . $accessToken;
 }
 ```
+
+### 仓库地址
+
+[Gitee](https://gitee.com/hillpy/ElemeSDK "ElemeSDK")<br>
+[Github](https://github.com/hillpy/ElemeSDK "ElemeSDK")<br>
+
+### 协议
+
+[MIT](https://github.com/hillpy/ElemeSDK/blob/master/LICENSE "MIT")<br>
