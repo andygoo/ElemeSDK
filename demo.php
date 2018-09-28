@@ -8,6 +8,9 @@ require __DIR__ . '/src/Eleme.php';
 
 use hillpy\ElemeSDK\Eleme;
 
+// 设置中国时区（个别接口涉及时间数据）
+date_default_timezone_set('PRC');
+
 // 设置变量
 $appId = '';
 $secretKey = '';
@@ -20,10 +23,12 @@ $paramArr = array(
     'accessToken'=>''
 );
 
+$debug = $paramArr['debug'] ? 'true' : 'false';
+
 // 从redis获取accessToken;
 $redis = new Redis();
 $redis->connect('127.0.0.1', 6379);
-$accessToken = $redis->get('eleme_access_token_appid_' . $appId);
+$accessToken = $redis->get('eleme_access_token_appid_' . $appId . '_debug_' . $debug);
 
 // 若存在accessToken，加入paramArr数组中
 $accessToken && $paramArr['accessToken'] = $accessToken;
@@ -43,7 +48,7 @@ if (!$accessToken) {
         } else {
             $cacheTime = 0;
         }
-        $redis->setex('eleme_access_token_appid_' . $appId, $cacheTime, $accessToken);
+        $redis->setex('eleme_access_token_appid_' . $appId . '_debug_' . $debug, $cacheTime, $accessToken);
     }
 }
 
@@ -53,3 +58,20 @@ if ($accessToken == '') {
 } else {
     echo 'accessToken:' . $accessToken . '<br>';
 }
+
+// 以添加添加门店接口为例，以下为门店接口请求数据及结果
+$extendParamArr['data'] = array(
+    'chain_store_code' => '',
+    'chain_store_name' => '',
+    'contact_phone' => '',
+    'address' => '',
+    'position_source' => 3,
+    'longitude' => '',
+    'latitude' => '',
+    'service_code' => 1
+);
+
+$res = $eleme->addChainStore($extendParamArr);
+
+var_dump('<pre>');
+var_dump($res);

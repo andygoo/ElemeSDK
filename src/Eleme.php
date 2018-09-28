@@ -81,12 +81,8 @@ class Eleme
      */
     public function getSignature()
     {
-        $paramArr = array(
-            'app_id'=>$this->appId,
-            'salt'=>$this->salt,
-            'secret_key'=>$this->secretKey,
-        );
-        return md5(urlencode(http_build_query($paramArr)));
+        $data = 'app_id=' . $this->appId . '&salt=' . $this->salt . '&secret_key=' . $this->secretKey;
+        return md5(urlencode($data));
     }
 
     /**
@@ -96,13 +92,8 @@ class Eleme
      */
     public function getBusinessSignature($data = '')
     {
-        $paramArr = array(
-            'app_id'=>$this->appId,
-            'access_token'=>$this->accessToken,
-            'data'=>urlencode($data),
-            'salt'=>$this->salt,
-        );
-        return md5((http_build_query($paramArr)));
+        $data = 'app_id=' . $this->appId . '&access_token=' . $this->accessToken . '&data=' . urlencode($data) . '&salt=' . $this->salt;
+        return md5($data);
     }
 
     /**
@@ -177,7 +168,7 @@ class Eleme
     public function addOrder($extendParamArr = array())
     {
         $paramArr = array_merge($extendParamArr, $this->commonParamArr);
-        $jsonData = count($paramArr['data']) > 0 ? Common::jsonEncode($paramArr['data'], 'JSON_UNESCAPED_UNICODE') : '';
+        $jsonData = isset($paramArr['data']) ? Common::jsonEncode($paramArr['data'], 'JSON_UNESCAPED_UNICODE') : '';
         $paramArr['data'] = urlencode($jsonData);
         $paramArr['signature'] = $this->getBusinessSignature($jsonData);
         $url = $this->apiHost . Eleme::ORDER_PATH;
@@ -200,7 +191,7 @@ class Eleme
     public function cancelOrder($extendParamArr = array())
     {
         $paramArr = array_merge($extendParamArr, $this->commonParamArr);
-        $jsonData = count($paramArr['data']) > 0 ? Common::jsonEncode($paramArr['data'], 'JSON_UNESCAPED_UNICODE') : '';
+        $jsonData = isset($paramArr['data']) ? Common::jsonEncode($paramArr['data'], 'JSON_UNESCAPED_UNICODE') : '';
         $paramArr['data'] = urlencode($jsonData);
         $paramArr['signature'] = $this->getBusinessSignature($jsonData);
         $url = $this->apiHost . Eleme::ORDER_CANCEL_PATH;
@@ -219,7 +210,7 @@ class Eleme
     public function queryOrder($extendParamArr = array())
     {
         $paramArr = array_merge($extendParamArr, $this->commonParamArr);
-        $jsonData = count($paramArr['data']) > 0 ? Common::jsonEncode($paramArr['data'], 'JSON_UNESCAPED_UNICODE') : '';
+        $jsonData = isset($paramArr['data']) ? Common::jsonEncode($paramArr['data'], 'JSON_UNESCAPED_UNICODE') : '';
         $paramArr['data'] = urlencode($jsonData);
         $paramArr['signature'] = $this->getBusinessSignature($jsonData);
         $url = $this->apiHost . Eleme::ORDER_QUERY_PATH;
@@ -241,7 +232,7 @@ class Eleme
     public function complaintOrder($extendParamArr = array())
     {
         $paramArr = array_merge($extendParamArr, $this->commonParamArr);
-        $jsonData = count($paramArr['data']) > 0 ? Common::jsonEncode($paramArr['data'], 'JSON_UNESCAPED_UNICODE') : '';
+        $jsonData = isset($paramArr['data']) ? Common::jsonEncode($paramArr['data'], 'JSON_UNESCAPED_UNICODE') : '';
         $paramArr['data'] = urlencode($jsonData);
         $paramArr['signature'] = $this->getBusinessSignature($jsonData);
         $url = $this->apiHost . Eleme::ORDER_COMPLAINT_PATH;
@@ -260,7 +251,7 @@ class Eleme
     public function getOrderCarrier($extendParamArr = array())
     {
         $paramArr = array_merge($extendParamArr, $this->commonParamArr);
-        $jsonData = count($paramArr['data']) > 0 ? Common::jsonEncode($paramArr['data'], 'JSON_UNESCAPED_UNICODE') : '';
+        $jsonData = isset($paramArr['data']) ? Common::jsonEncode($paramArr['data'], 'JSON_UNESCAPED_UNICODE') : '';
         $paramArr['data'] = urlencode($jsonData);
         $paramArr['signature'] = $this->getBusinessSignature($jsonData);
         $url = $this->apiHost . Eleme::ORDER_CARRIER_PATH;
@@ -286,7 +277,7 @@ class Eleme
     public function addChainStore($extendParamArr = array())
     {
         $paramArr = array_merge($extendParamArr, $this->commonParamArr);
-        $jsonData = count($paramArr['data']) > 0 ? Common::jsonEncode($paramArr['data'], 'JSON_UNESCAPED_UNICODE') : '';
+        $jsonData = isset($paramArr['data']) ? Common::jsonEncode($paramArr['data'], 'JSON_UNESCAPED_UNICODE') : '';
         $paramArr['data'] = urlencode($jsonData);
         $paramArr['signature'] = $this->getBusinessSignature($jsonData);
         $url = $this->apiHost . Eleme::CHAIN_STORE_PATH;
@@ -305,7 +296,7 @@ class Eleme
     public function queryChainStore($extendParamArr = array())
     {
         $paramArr = array_merge($extendParamArr, $this->commonParamArr);
-        $jsonData = count($paramArr['data']) > 0 ? Common::jsonEncode($paramArr['data'], 'JSON_UNESCAPED_UNICODE') : '';
+        $jsonData = isset($paramArr['data']) ? Common::jsonEncode($paramArr['data'], 'JSON_UNESCAPED_UNICODE') : '';
         $paramArr['data'] = urlencode($jsonData);
         $paramArr['signature'] = $this->getBusinessSignature($jsonData);
         $url = $this->apiHost . Eleme::CHAIN_STORE_QUERY_PATH;
@@ -330,7 +321,7 @@ class Eleme
     public function updateChainStore($extendParamArr = array())
     {
         $paramArr = array_merge($extendParamArr, $this->commonParamArr);
-        $jsonData = count($paramArr['data']) > 0 ? Common::jsonEncode($paramArr['data'], 'JSON_UNESCAPED_UNICODE') : '';
+        $jsonData = isset($paramArr['data']) ? Common::jsonEncode($paramArr['data'], 'JSON_UNESCAPED_UNICODE') : '';
         $paramArr['data'] = urlencode($jsonData);
         $paramArr['signature'] = $this->getBusinessSignature($jsonData);
         $url = $this->apiHost . Eleme::CHAIN_STORE_UPDATE_PATH;
@@ -351,7 +342,7 @@ class Eleme
     public function queryChainStoreDelivery($extendParamArr = array())
     {
         $paramArr = array_merge($extendParamArr, $this->commonParamArr);
-        $jsonData = count($paramArr['data']) > 0 ? Common::jsonEncode($paramArr['data'], 'JSON_UNESCAPED_UNICODE') : '';
+        $jsonData = isset($paramArr['data']) ? Common::jsonEncode($paramArr['data'], 'JSON_UNESCAPED_UNICODE') : '';
         $paramArr['data'] = urlencode($jsonData);
         $paramArr['signature'] = $this->getBusinessSignature($jsonData);
         $url = $this->apiHost . Eleme::CHAIN_STORE_DELIVERY_QUERY_PATH;

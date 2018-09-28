@@ -49,7 +49,6 @@ class Common
         } else if ($option) {
             return json_encode($arr, $option);
         } else {
-            print_r(json_encode($arr));
             return json_encode($arr);
         }
     }
